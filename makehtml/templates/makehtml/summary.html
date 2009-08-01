@@ -1,0 +1,10 @@
+{% if title %}<h4>{{title}}</h4>{% endif %}
+
+<div class="body">
+    {% if summary %}
+        {{summary|removetags:"p,br,span"|safe}}
+    {% else %}
+        {{body|truncatewords_html:"100"|removetags:"p,br,span"|safe}}
+    {% endif %}
+
+</div>
