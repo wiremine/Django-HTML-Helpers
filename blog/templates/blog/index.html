@@ -1,5 +1,5 @@
 {% load makehtml %}
 
 {% for post in posts %}
-    {{post|makehtml:"summary"}}
+    {{post|html:"detail"}}
 {% endfor %}

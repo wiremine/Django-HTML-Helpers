@@ -9,6 +9,9 @@ register = template.Library()
 template_chosen = django.dispatch.Signal(providing_args=["obj", "template"])
 context_populated = django.dispatch.Signal(providing_args=["obj", "context"])
 
+import logging
+logging.getLogger().setLevel(logging.DEBUG)
+
 def _iterate_names(obj, names):
     """
     Inspect an object for a value that might have multiple names.
@@ -38,8 +41,8 @@ def _select_helper_template(obj, template_kind):
     template_names = []
 
     # Could be hard coded
-    if hasattr(obj, 'template'):
-        template_names.append(getattr(obj, 'template'))
+    if hasattr(obj, 'template_name'):
+        template_names.append(getattr(obj, 'template_name'))
 
     # Could be a django model
     if isinstance(obj, Model):
@@ -71,26 +74,33 @@ def _populate_context(obj, context):
     """
     Populate the context with common elements
     """
-    context['title'] = _iterate_names(obj, ['title', 'name'])
-    context['body'] = _iterate_names(obj, ['body', 'content', 'text', 'description', 'long_description'])
+    context['title'] = _iterate_names(obj, ['title', 'name', 'headline'])
+    context['body'] = _iterate_names(obj, ['body', 'content', 'text', 'note', 'description', 'long_description', 'message', 'question', 'choice'])
     context['summary'] = _iterate_names(obj, ['summary', 'excerpt', 'short_description'])    
     context['first_name'] = _iterate_names(obj, ['first_name', 'firstname'])
     context['last_name'] = _iterate_names(obj, ['last_name', 'lastname'])
     context['sub_title'] = _iterate_names(obj, ['sub_title', 'subtitle'])
-    context['author'] = _iterate_names(obj, ['author'])
+    context['author'] = _iterate_names(obj, ['author', 'creator'])
     context['email'] = _iterate_names(obj, ['email'])
-    context['pub_date'] = _iterate_names(obj, ['timestamp', 'publish_on', 'published_on'])
+    context['pub_date'] = _iterate_names(obj, ['pub_date', 'timestamp', 'publish_on', 'published_on', 'creation_date', 'date_added'])
     context['thumbnail'] = _iterate_names(obj, ['thumbnail', 'thumbnail_url'])
     context['mp3_url'] = _iterate_names(obj, ['mp3_url', 'podcast_url'])    
     context['categories'] = _iterate_names(obj, ['categories', 'category', 'category_set'])
+    context['is_public'] = _iterate_names(obj, ['is_public', 'published'])
+    context['obj'] = obj
+    # TODOs:
+    # URLs
+    # Event: start/stop
     return context
 
-@register.filter(name='makehtml')
-def makehtml(value, htmltype='summary'):
-    """Create an HTML 'summary' of a given object"""
+@register.filter(name='html')
+def html(value, htmltype='summary'):
+    """Introspect an object to create HTML."""
     template = _select_helper_template(value, htmltype)
     context = _populate_context(value, Context())
+
     context_populated.send(sender=None, obj=value, context=context)
+    logging.debug("Made HTML '%s'" % htmltype)
     
     return template.render(context)
     

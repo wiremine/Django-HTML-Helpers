@@ -1,4 +1,7 @@
 # Django settings for helpers project.
+import os
+PROJECT_ROOT = os.path.normpath(os.path.dirname(__file__))
+
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -61,6 +64,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'firepython.middleware.FirePythonDjango',
 )
 
 ROOT_URLCONF = 'helpers.urls'

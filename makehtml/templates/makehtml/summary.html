@@ -1,4 +1,5 @@
-{% if title %}<h4>{{title}}</h4>{% endif %}
+{% with obj.get_absolute_url as target_url %}
+{% if title %}<h4>{% if target_url %}<a href="{{target_url}}">{{title}}</a>{%else%}{{title}}{% endif %}</h4>{% endif %}
 
 <div class="body">
     {% if summary %}
@@ -6,5 +7,5 @@
     {% else %}
         {{body|truncatewords_html:"100"|removetags:"p,br,span"|safe}}
     {% endif %}
-
 </div>
+{% endwith %}
